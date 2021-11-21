@@ -31,23 +31,21 @@ function load() {
                                     _load(absolutePath);
                                 } else {
                                     try {
-                                        if (!REGEXP.test(absolutePath)) {
-                                            return;
+                                        if (REGEXP.test(absolutePath)) {
+                                            const absolutePathWhithoutExt = absolutePath.replace(REGEXP, '');
+	                                        const relativePathWhithoutExt = relative(root, absolutePathWhithoutExt);
+	                                        const paths = relativePathWhithoutExt.split('/');
+	                                        let currentNode = fileTree;
+	                                        for (let j = 0; j < paths.length - 1; j++) {
+	                                            const path = paths[j];
+	                                            if (typeof currentNode[path] === 'object' && currentNode[path] !== null) {
+	                                                currentNode = currentNode[path];
+	                                            } else {
+	                                                currentNode = currentNode[path] = {};
+	                                            }
+	                                        }
+	                                        currentNode[paths[paths.length - 1]] = require(absolutePath);
                                         }
-                                        const absolutePathWhithoutExt = absolutePath.replace(REGEXP, '');
-                                        const relativePathWhithoutExt = relative(root, absolutePathWhithoutExt);
-                                        const paths = relativePathWhithoutExt.split('/');
-                                        let currentNode = fileTree;
-                                        for (let j = 0; j < paths.length - 1; j++) {
-                                            const path = paths[j];
-                                            if (typeof currentNode[path] === 'object' && currentNode[path] !== null) {
-                                                currentNode = currentNode[path];
-                                            } else {
-                                                currentNode = currentNode[path] = {};
-                                            }
-                                        }
-                                        currentNode[paths[paths.length - 1]] = require(absolutePath);
-                                        
                                     } catch(e) {
                                         console.error(e);
                                         !done && reject(e);
